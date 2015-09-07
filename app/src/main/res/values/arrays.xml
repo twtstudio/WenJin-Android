@@ -5,7 +5,7 @@
         <item>@string/drawer_item_home</item>
         <item>@string/drawer_item_explore</item>
         <item>@string/drawer_item_topic</item>
-        <item>@string/drawer_item_user</item>
+        <item>@string/drawer_item_draft</item>
         <item>@string/drawer_item_setting</item>
         <item>@string/drawer_item_helper_and_feedback</item>
         <item>@string/drawer_item_logout</item>
@@ -17,10 +17,14 @@
     </string-array>
 
     <string-array name="explore_tab_titles">
-        <item>@string/explore_recommend</item>
-        <item>@string/explore_hot</item>
         <item>@string/explore_new</item>
+        <item>@string/explore_hot</item>
+        <item>@string/explore_recommend</item>
         <item>@string/explore_unresponsive</item>
     </string-array>
 
+    <string-array name="notification_tab_titles">
+        <item>@string/notification_unread</item>
+        <item>@string/notification_read</item>
+    </string-array>
 </resources>

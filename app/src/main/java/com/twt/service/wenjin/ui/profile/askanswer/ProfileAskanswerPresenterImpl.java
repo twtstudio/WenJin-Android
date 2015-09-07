@@ -40,6 +40,7 @@ public class ProfileAskanswerPresenterImpl implements
 
     @Override
     public void loadMoreItems(String type,int uid) {
+        if(_isLoadMore){return;}
         _page += 1;
         _isLoadMore = true;
         _profileAskanswerView.showFooter();
@@ -72,7 +73,7 @@ public class ProfileAskanswerPresenterImpl implements
         }
 
         if(type.compareTo(ACTION_TYPE_ASK) == 0 ){
-           _profileAskanswerInteractor.getAskItems(uid,_page,10,this);
+            _profileAskanswerInteractor.getAskItems(uid,_page,10,this);
         }
     }
 
@@ -115,6 +116,7 @@ public class ProfileAskanswerPresenterImpl implements
             _profileAskanswerView.toastMessage(ResourceHelper.getString(R.string.no_more_information));
         }
         _profileAskanswerView.hideFooter();
+        _isLoadMore = false;
 
     }
 

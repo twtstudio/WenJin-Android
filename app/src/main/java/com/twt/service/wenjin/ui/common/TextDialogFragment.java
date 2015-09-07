@@ -4,7 +4,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -18,12 +18,18 @@ public class TextDialogFragment extends DialogFragment {
 
     private static final String PARAM_TEXT = "text";
 
+    private MaterialDialog.ButtonCallback callback;
+
     public static TextDialogFragment newInstance(String text) {
         TextDialogFragment fragment = new TextDialogFragment();
         Bundle bundle = new Bundle();
         bundle.putString(PARAM_TEXT, text);
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    public void setCallback(MaterialDialog.ButtonCallback callback) {
+        this.callback = callback;
     }
 
     @NonNull
@@ -35,10 +41,18 @@ public class TextDialogFragment extends DialogFragment {
         return new MaterialDialog.Builder(getActivity())
                 .customView(textView, true)
                 .positiveText(android.R.string.ok)
+                .callback(callback)
                 .build();
     }
 
-    public void show(ActionBarActivity context) {
+    public void show(AppCompatActivity context) {
         show(context.getSupportFragmentManager(), "TEXT_DISPLAY");
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        dismiss();
+    }
+
 }

@@ -3,12 +3,14 @@ package com.twt.service.wenjin.ui.answer.comment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -78,8 +80,12 @@ public class CommentActivity extends BaseActivity implements CommentView, OnItem
 
         ivPublish.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                mPresenter.publishComment(answerId, etContent.getText().toString());
+            public void onClick(final View v) {
+                v.setClickable(false);
+                mPresenter.publishComment(answerId, etContent.getText().toString(), v);
+                etContent.setText("");
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
     }
@@ -93,7 +99,7 @@ public class CommentActivity extends BaseActivity implements CommentView, OnItem
     }
 
     @Override
-    protected List<Object> getModlues() {
+    protected List<Object> getModules() {
         return Arrays.<Object>asList(new CommentModule(this));
     }
 

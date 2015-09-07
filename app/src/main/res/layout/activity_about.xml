@@ -2,9 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:paddingBottom="16dp"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="false"
     tools:context="com.twt.service.wenjin.ui.about.AboutActivity">
 
     <include

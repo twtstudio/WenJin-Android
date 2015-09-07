@@ -23,7 +23,9 @@ public class HomePresenterImpl implements HomePresenter, OnGetItemsCallback {
 
     private int mItemsPerPage = 20;
     private int mPage = 0;
-    private boolean isLoadingMore = false;
+    private boolean isLoadingMore = false;  //is loading more?
+    private boolean isFirstTimeLoad = true; //is fitsrt time to load data for recylerView
+    private boolean isRefreshing = false;  //is refreshing to reset the recylerView data?
 
     public HomePresenterImpl(HomeView homeView, HomeInteractor homeInteractor) {
         this.mHomeView = homeView;
@@ -32,16 +34,28 @@ public class HomePresenterImpl implements HomePresenter, OnGetItemsCallback {
 
     @Override
     public void refreshHomeItems() {
+        if(isRefreshing) return;
         mPage = 0;
+        isRefreshing = true;
         mHomeView.showRefresh();
-//        mHomeView.useLoadMoreFooter();
+        mHomeInteractor.getHomeItems(mItemsPerPage, mPage, this);
+    }
+
+    @Override
+    public void firstTimeRefreshHomeItems() {
+        mPage = 0;
+        isRefreshing = true;
+        mHomeView.useLoadMoreFooter();
         mHomeInteractor.getHomeItems(mItemsPerPage, mPage, this);
     }
 
     @Override
     public void loadMoreHomeItems() {
+        if(isLoadingMore){ return; }  //load more action only allowed existed one
+
         mPage += 1;
         isLoadingMore = true;
+        mHomeView.useLoadMoreFooter();
         mHomeInteractor.getHomeItems(mItemsPerPage, mPage, this);
     }
 
@@ -55,7 +69,7 @@ public class HomePresenterImpl implements HomePresenter, OnGetItemsCallback {
                 mHomeView.startProfileActivity(position);
                 break;
             case R.id.tv_home_item_title:
-                mHomeView.startQuestionActivity(position);
+                mHomeView.startQuestionArticlActivity(position);
                 break;
             case R.id.tv_home_item_content:
                 mHomeView.startAnswerActivity(position);
@@ -68,24 +82,34 @@ public class HomePresenterImpl implements HomePresenter, OnGetItemsCallback {
 
     @Override
     public void onSuccess(HomeResponse homeResponse) {
-        mHomeView.hideRefresh();
 
         if (homeResponse.total_rows == 0) {
             mHomeView.toastMessage(ResourceHelper.getString(R.string.no_more_information));
             mHomeView.hideLoadMoreFooter();
+            isLoadingMore = false;
+            isRefreshing = false;
             return;
         }
         if (isLoadingMore) {
             mHomeView.loadMoreItems((ArrayList<HomeItem>) homeResponse.rows);
+            mHomeView.hideLoadMoreFooter();
             isLoadingMore = false;
         } else {
+            mHomeView.hideRefresh();
             mHomeView.refreshItems((ArrayList<HomeItem>) homeResponse.rows);
-            mHomeView.useLoadMoreFooter();
+            if(isFirstTimeLoad){
+                mHomeView.hideLoadMoreFooter();
+                isFirstTimeLoad = !isFirstTimeLoad;
+            }
+            isRefreshing = false;
         }
+
     }
 
     @Override
     public void onFailure(String errorString) {
+        isLoadingMore = false;
+        isRefreshing = false;
         mHomeView.hideRefresh();
         if (errorString != null) {
             mHomeView.toastMessage(errorString);

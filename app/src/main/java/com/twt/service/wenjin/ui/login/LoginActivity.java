@@ -1,18 +1,23 @@
 package com.twt.service.wenjin.ui.login;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.twt.service.wenjin.R;
 import com.twt.service.wenjin.api.ApiClient;
-import com.twt.service.wenjin.support.NetworkHelper;
+import com.twt.service.wenjin.support.JPushHelper;
+import com.twt.service.wenjin.support.StatusBarHelper;
 import com.twt.service.wenjin.ui.BaseActivity;
+import com.twt.service.wenjin.ui.login.green_channel.GreenChannelActivity;
 import com.twt.service.wenjin.ui.main.MainActivity;
 
 import java.util.Arrays;
@@ -22,6 +27,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import cn.jpush.android.api.JPushInterface;
 
 public class LoginActivity extends BaseActivity implements LoginView, View.OnClickListener {
 
@@ -37,6 +43,11 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
     Button mBtLogin;
     @InjectView(R.id.pb_login)
     ProgressBar mPbLogin;
+    @InjectView(R.id.iv_login_logo)
+    ImageView ivLoginLogo;
+    @InjectView(R.id.bt_green_channel)
+    TextView btGreenChannel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +55,33 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
 
+
+        JPushInterface.clearAllNotifications(getApplicationContext());
+        JPushHelper jPushHelper = new JPushHelper(null,null);
+        jPushHelper.cancelAlias();
+
         ApiClient.userLogout();
+
+
         mBtLogin.setOnClickListener(this);
+        btGreenChannel.setOnClickListener(this);
     }
 
     @Override
-    protected List<Object> getModlues() {
+    protected List<Object> getModules() {
         return Arrays.<Object>asList(new LoginModule(this));
     }
 
     @Override
     public void onClick(View v) {
-        mLoginPresenter.validateLogin(mEtUsername.getText().toString(), mEtPassword.getText().toString());
+        switch (v.getId()) {
+            case R.id.bt_login:
+                mLoginPresenter.validateLogin(mEtUsername.getText().toString(), mEtPassword.getText().toString());
+                break;
+            case R.id.bt_green_channel:
+                GreenChannelActivity.actionStart(this);
+        }
+
     }
 
     @Override
@@ -79,6 +105,13 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
     }
 
     @Override
+    public void hideKeyboard() {
+        InputMethodManager inputMethodManager = (InputMethodManager) getApplicationContext().
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(mEtPassword.getWindowToken(), 0);
+    }
+
+    @Override
     public void toastMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
@@ -88,5 +121,11 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         this.finish();
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        StatusBarHelper.setStatusBar(this);
     }
 }

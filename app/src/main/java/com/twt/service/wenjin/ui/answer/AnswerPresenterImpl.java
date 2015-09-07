@@ -37,8 +37,12 @@ public class AnswerPresenterImpl implements AnswerPresenter, OnAnswerCallback, O
         mAttachKey = MD5Utils.createAttachKey();
         System.out.println(mAttachKey);
         mIsAnonymous = isAnonymous;
-        for (int i = 0; i < mFilePath.size(); i++) {
-            mInteractor.uploadFile(new File(mFilePath.get(i)), mAttachKey, this);
+        if (mFilePath.size() > 0) {
+            for (int i = 0; i < mFilePath.size(); i++) {
+                mInteractor.uploadFile(new File(mFilePath.get(i)), mAttachKey, this);
+            }
+        } else {
+            publishAnswer();
         }
     }
 
@@ -66,7 +70,7 @@ public class AnswerPresenterImpl implements AnswerPresenter, OnAnswerCallback, O
     @Override
     public void onAnswerSuccess(int answerId) {
         mView.toastMessage(ResourceHelper.getString(R.string.publish_success));
-        mView.finishActivity();
+        mView.finishWithoutHint();
     }
 
     @Override

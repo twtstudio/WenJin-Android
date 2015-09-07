@@ -13,12 +13,22 @@ public interface AnswerDetailView {
 
     void bindAnswerData(Answer answer);
 
+    void bindTitle(String title);
+
     void toastMessage(String msg);
 
-    void setAgree(boolean isAgree, int agreeCount);
+    void setAgree(int argVoteState, int agreeCount);
+
+    void setDisAgree(int argVoteState);
+
+    void setAgreeCount(int agreeCount);
+
+    void setThank(boolean isThank);
 
     void startProfileActivity();
 
     void startCommentActivity();
+
+    void startQuestionActivity();
 
 }

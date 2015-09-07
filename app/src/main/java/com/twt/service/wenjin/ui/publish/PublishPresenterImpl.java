@@ -39,10 +39,14 @@ public class PublishPresenterImpl implements PublishPresenter, OnPublishCallback
         mContent = content;
         parseTopics(topics);
         mAttachKey = MD5Utils.createAttachKey();
-        System.out.println(mAttachKey);
+//        System.out.println(mAttachKey);
         mIsAnonymous = isAnonymous;
-        for (int i = 0; i < mFilePath.size(); i++) {
-            mInteractor.uploadFile(new File(mFilePath.get(i)), mAttachKey, this);
+        if (mFilePath.size() > 0) {
+            for (int i = 0; i < mFilePath.size(); i++) {
+                mInteractor.uploadFile(new File(mFilePath.get(i)), mAttachKey, this);
+            }
+        } else {
+            publishQuestion();
         }
     }
 
@@ -55,6 +59,7 @@ public class PublishPresenterImpl implements PublishPresenter, OnPublishCallback
 
     private void publishQuestion() {
         if (mAttach.size() == mFilePath.size()) {
+            LogHelper.d(LogHelper.makeLogTag(this.getClass()), "publsih");
             mInteractor.publishQuestion(mTitle, parseContent(mContent), mAttachKey, mTopics, mIsAnonymous, this);
         }
     }
@@ -72,6 +77,7 @@ public class PublishPresenterImpl implements PublishPresenter, OnPublishCallback
         if (topics.length > 0) {
             mTopics += topics[0];
             for (int i = 1; i < topics.length; i++) {
+                mTopics += ",";
                 mTopics += topics[i];
             }
         }

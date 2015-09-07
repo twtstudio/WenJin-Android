@@ -4,14 +4,17 @@ import android.app.Application;
 import android.content.Context;
 
 import com.activeandroid.ActiveAndroid;
-import com.loopj.android.http.PersistentCookieStore;
-import com.twt.service.wenjin.api.ApiClient;
+
 import com.twt.service.wenjin.support.CrashHandler;
+import com.twt.service.wenjin.support.JPushHelper;
+import com.twt.service.wenjin.support.PrefUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
+import cn.jpush.android.api.JPushInterface;
 import dagger.ObjectGraph;
+import im.fir.sdk.FIR;
 
 /**
  * Created by M on 2015/3/19.
@@ -19,24 +22,26 @@ import dagger.ObjectGraph;
 public class WenJinApp extends Application {
 
     private static Context sContext;
-    private static PersistentCookieStore sCookieStore;
+
+    private static boolean sIsAppLunched;
 
     private ObjectGraph objectGraph;
 
     @Override
     public void onCreate() {
+        FIR.init(this);
         super.onCreate();
         objectGraph = ObjectGraph.create(getModules().toArray());
         objectGraph.inject(this);
 
         sContext = getApplicationContext();
-        sCookieStore = new PersistentCookieStore(sContext);
-        ApiClient.getInstance().setCookieStore(sCookieStore);
-
-//        CrashHandler crashHandler = CrashHandler.getInstance();
-//        crashHandler.init(sContext);
 
         ActiveAndroid.initialize(this);
+
+        JPushInterface.setDebugMode(true);
+        JPushInterface.init(this);
+        JPushHelper.mContext = getApplicationContext();
+        JPushHelper.setNotiStyleBasic();
     }
 
     private List<Object> getModules() {
@@ -51,7 +56,11 @@ public class WenJinApp extends Application {
         return sContext;
     }
 
-    public static PersistentCookieStore getCookieStore() {
-        return sCookieStore;
+    public static boolean isAppLunched(){
+        return sIsAppLunched;
+    }
+
+    public static void setAppLunchState(Boolean argState){
+        sIsAppLunched = argState;
     }
 }

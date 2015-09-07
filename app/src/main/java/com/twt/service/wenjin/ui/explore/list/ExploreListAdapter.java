@@ -2,6 +2,7 @@ package com.twt.service.wenjin.ui.explore.list;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.twt.service.wenjin.R;
 import com.twt.service.wenjin.api.ApiClient;
+import com.twt.service.wenjin.bean.AnswerInfo;
 import com.twt.service.wenjin.bean.ExploreItem;
 import com.twt.service.wenjin.bean.UserInfo;
 import com.twt.service.wenjin.support.FormatHelper;
@@ -43,20 +45,23 @@ public class ExploreListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public static class ItemHolder extends RecyclerView.ViewHolder{
 
-        @InjectView(R.id.tv_explore_item_title)
+        @InjectView(R.id.tv_home_item_title)
         TextView _tvTitle;
 
-        @InjectView(R.id.iv_explore_item_avatar)
+        @InjectView(R.id.iv_home_item_avatar)
         ImageView _ivAvatar;
 
-        @InjectView(R.id.tv_explore_item_user)
+        @InjectView(R.id.tv_home_item_username)
         TextView _tvUser;
 
-        @InjectView(R.id.tv_explore_item_state)
+        @InjectView(R.id.tv_home_item_status)
         TextView _tvState;
 
-        @InjectView(R.id.tv_explore_item_time)
+        @InjectView(R.id.tv_home_item_time)
         TextView _tvTime;
+
+        @InjectView(R.id.tv_home_item_content)
+        TextView _tvContent;
 
         public ItemHolder(View itemView) {
             super(itemView);
@@ -89,7 +94,7 @@ public class ExploreListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         RecyclerView.ViewHolder viewHolder;
 
         if(viewType == ITEM_VIEW_TYPE_ITEM){
-            View view = inflater.inflate(R.layout.explore_list_item,viewGroup,false);
+            View view = inflater.inflate(R.layout.home_list_item,viewGroup,false);
             viewHolder = new ItemHolder(view);
         }else{
             View view = inflater.inflate(R.layout.recyclerview_footer_load_more,viewGroup,false);
@@ -116,15 +121,18 @@ public class ExploreListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             itemHolder._ivAvatar.setOnClickListener(onClickListener);
             itemHolder._tvUser.setOnClickListener(onClickListener);
             itemHolder._tvTitle.setOnClickListener(onClickListener);
+            itemHolder._tvContent.setOnClickListener(onClickListener);
 
             if( 0 == exploreItem.post_type.compareTo("article")){
                 itemHolder._tvTitle.setText(exploreItem.title);
                 itemHolder._tvTime.setText(FormatHelper.getTimeFromNow(exploreItem.add_time));
-
+                itemHolder._tvContent.setVisibility(View.GONE);
                 if(exploreItem.user_info != null) {
                     itemHolder._tvUser.setText(exploreItem.user_info.nick_name);
-                    if(exploreItem.user_info.avatar_file != ""){
+                    if((!TextUtils.isEmpty(exploreItem.user_info.avatar_file)) ){
                         Picasso.with(_context).load(ApiClient.getAvatarUrl(exploreItem.user_info.avatar_file)).into(itemHolder._ivAvatar);
+                    } else {
+                        itemHolder._ivAvatar.setImageResource(R.drawable.ic_user_avatar);
                     }
                 }
                 itemHolder._tvState.setText(ResourceHelper.getString(R.string.post_article));
@@ -133,20 +141,30 @@ public class ExploreListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             itemHolder._tvTitle.setText(exploreItem.question_content);
             itemHolder._tvTime.setText(FormatHelper.getTimeFromNow(exploreItem.update_time));
+            itemHolder._tvContent.setVisibility(View.VISIBLE);
             if(0 == exploreItem.answer_count){
                 if(exploreItem.user_info != null) {
                     itemHolder._tvUser.setText(exploreItem.user_info.nick_name);
-                    if(exploreItem.user_info.avatar_file != ""){
+                    if((!TextUtils.isEmpty(exploreItem.user_info.avatar_file)) ){
                         Picasso.with(_context).load(ApiClient.getAvatarUrl(exploreItem.user_info.avatar_file)).into(itemHolder._ivAvatar);
+                    } else {
+                        itemHolder._ivAvatar.setImageResource(R.drawable.ic_user_avatar);
                     }
                 }
                 itemHolder._tvState.setText(ResourceHelper.getString(R.string.post_question));
+                itemHolder._tvContent.setVisibility(View.GONE);
             }else{
                 if(exploreItem.answer_users.length > 0){
-                    UserInfo userInfo = exploreItem.answer_users[0];
+                    AnswerInfo userInfo = exploreItem.answer_users[0];
                     itemHolder._tvUser.setText(userInfo.nick_name);
-                    if(userInfo.avatar_file != ""){
+                    if ((!TextUtils.isEmpty(userInfo.avatar_file)) ) {
                         Picasso.with(_context).load(ApiClient.getAvatarUrl(userInfo.avatar_file)).into(itemHolder._ivAvatar);
+                    } else {
+                        itemHolder._ivAvatar.setImageResource(R.drawable.ic_user_avatar);
+                    }
+                    if (!TextUtils.isEmpty(userInfo.answer_content)){
+                        itemHolder._tvContent.setVisibility(View.VISIBLE);
+                        itemHolder._tvContent.setText(userInfo.answer_content);
                     }
                 }
                 itemHolder._tvState.setText(ResourceHelper.getString(R.string.reply_question));
@@ -154,7 +172,6 @@ public class ExploreListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
 
         }
-
 
     }
 

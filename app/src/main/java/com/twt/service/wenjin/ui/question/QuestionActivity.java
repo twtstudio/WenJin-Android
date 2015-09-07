@@ -16,11 +16,16 @@ import com.twt.service.wenjin.R;
 import com.twt.service.wenjin.bean.Answer;
 import com.twt.service.wenjin.bean.QuestionInfo;
 import com.twt.service.wenjin.bean.QuestionResponse;
+import com.twt.service.wenjin.support.FormatHelper;
 import com.twt.service.wenjin.support.LogHelper;
+import com.twt.service.wenjin.support.ResourceHelper;
+import com.twt.service.wenjin.support.UmengShareHelper;
 import com.twt.service.wenjin.ui.BaseActivity;
 import com.twt.service.wenjin.ui.answer.AnswerActivity;
 import com.twt.service.wenjin.ui.answer.detail.AnswerDetailActivity;
 import com.twt.service.wenjin.ui.common.OnItemClickListener;
+import com.twt.service.wenjin.receiver.JPushNotiReceiver;
+import com.twt.service.wenjin.ui.main.MainActivity;
 import com.twt.service.wenjin.ui.profile.ProfileActivity;
 
 import java.util.Arrays;
@@ -37,6 +42,7 @@ public class QuestionActivity extends BaseActivity implements QuestionView, OnIt
 
     private static final String PARAM_QUESTION_ID = "question_id";
 
+
     @Inject
     QuestionPresenter mPresenter;
 
@@ -50,6 +56,11 @@ public class QuestionActivity extends BaseActivity implements QuestionView, OnIt
     private QuestionAdapter mQuestionAdapter;
     private LinearLayoutManager mLinearLayoutManager;
     private int questionId;
+    private int mIntentFlag;
+
+//    private UMSocialService umSocialService = UMServiceFactory.getUMSocialService("com.umeng.share");
+
+//    private UMSocialService umSocialService = UMServiceFactory.getUMSocialService("com.umeng.share");
 
     public static void actionStart(Context context, int questionId) {
         Intent intent = new Intent(context, QuestionActivity.class);
@@ -70,6 +81,7 @@ public class QuestionActivity extends BaseActivity implements QuestionView, OnIt
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         questionId = getIntent().getIntExtra(PARAM_QUESTION_ID, 0);
+        mIntentFlag = getIntent().getIntExtra(JPushNotiReceiver.INTENT_FLAG_NOTIFICATION, 0 );
         LogHelper.v(LOG_TAG, "question id:" + questionId);
         mPresenter.loadingContent(questionId);
     }
@@ -89,12 +101,20 @@ public class QuestionActivity extends BaseActivity implements QuestionView, OnIt
             case R.id.action_answer:
                 this.startAnswerActivity();
                 break;
+            case R.id.action_share:
+                UmengShareHelper.init(this);
+                UmengShareHelper.setContent(
+                        this,
+                        mQuestionAdapter.getQuestionInfo().question_content,
+                        FormatHelper.formatQuestionLink(mQuestionAdapter.getQuestionInfo().question_id)
+                );
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected List<Object> getModlues() {
+    protected List<Object> getModules() {
         return Arrays.<Object>asList(new QuestionModule(this));
     }
 
@@ -108,10 +128,18 @@ public class QuestionActivity extends BaseActivity implements QuestionView, OnIt
                 mPresenter.actionFocus(mQuestionAdapter.getQuestionInfo().question_id);
                 break;
             case R.id.iv_question_answer_avatar:
-                startProfileActivity(position);
+                if (mQuestionAdapter.getAnswer(position).uid == -1){
+                    Toast.makeText(this, ResourceHelper.getString(R.string.not_exist), Toast.LENGTH_SHORT).show();
+                }else {
+                    startProfileActivity(position);
+                }
                 break;
             case R.id.tv_question_answer_username:
-                startProfileActivity(position);
+                if(mQuestionAdapter.getAnswer(position).uid == -1){
+                    Toast.makeText(this, ResourceHelper.getString(R.string.not_exist), Toast.LENGTH_SHORT).show();
+                }else {
+                    startProfileActivity(position);
+                }
                 break;
             case R.id.tv_question_answer_content:
                 startAnswerDetailActivty(position);
@@ -154,7 +182,7 @@ public class QuestionActivity extends BaseActivity implements QuestionView, OnIt
 
     @Override
     public void startAnswerActivity() {
-        AnswerActivity.actionStart(this, questionId);
+        AnswerActivity.actionStart(this, questionId, mQuestionAdapter.getQuestionInfo().question_content);
     }
 
     @Override

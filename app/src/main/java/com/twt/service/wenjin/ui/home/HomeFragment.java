@@ -4,8 +4,10 @@ package com.twt.service.wenjin.ui.home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +21,12 @@ import com.twt.service.wenjin.bean.HomeItem;
 import com.twt.service.wenjin.support.LogHelper;
 import com.twt.service.wenjin.ui.BaseFragment;
 import com.twt.service.wenjin.ui.answer.detail.AnswerDetailActivity;
+import com.twt.service.wenjin.ui.article.ArticleActivity;
 import com.twt.service.wenjin.ui.common.OnItemClickListener;
 import com.twt.service.wenjin.ui.profile.ProfileActivity;
 import com.twt.service.wenjin.ui.publish.PublishActivity;
 import com.twt.service.wenjin.ui.question.QuestionActivity;
+import com.twt.service.wenjin.ui.topic.detail.TopicDetailActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +67,7 @@ public class HomeFragment extends BaseFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPresenter.refreshHomeItems();
+//        mPresenter.refreshHomeItems();
     }
 
     @Override
@@ -80,7 +84,7 @@ public class HomeFragment extends BaseFragment implements
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mHomeAdapter);
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -94,7 +98,7 @@ public class HomeFragment extends BaseFragment implements
                 if (firstVisibleItemPosition > mPrevFirstVisiblePosition) {
 //                    LogHelper.v(LOG_TAG, "scroll down");
                     hideFabMenu();
-                } else if(firstVisibleItemPosition < mPrevFirstVisiblePosition) {
+                } else if (firstVisibleItemPosition < mPrevFirstVisiblePosition) {
 //                    LogHelper.v(LOG_TAG, "scroll up");
                     showFabMenu();
                 }
@@ -110,6 +114,8 @@ public class HomeFragment extends BaseFragment implements
             }
         });
 
+        //mPresenter.refreshHomeItems();
+        mPresenter.firstTimeRefreshHomeItems();
         return rootView;
     }
 
@@ -139,12 +145,19 @@ public class HomeFragment extends BaseFragment implements
     }
 
     @Override
-    public void startQuestionActivity(int position) {
+    public void startQuestionArticlActivity(int position) {
         HomeItem item = mHomeAdapter.getItem(position);
         if (item.question_info != null) {
             LogHelper.v(LOG_TAG, "start question activity");
             QuestionActivity.actionStart(getActivity(), item.question_info.question_id);
+        }else if (item.article_info !=null){
+            ArticleActivity.actionStart(getActivity(), item.article_info.id);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -158,6 +171,10 @@ public class HomeFragment extends BaseFragment implements
     @Override
     public void startProfileActivity(int position) {
         HomeItem item = mHomeAdapter.getItem(position);
+        if(item.topic_info != null){
+            TopicDetailActivity.actionStart(getActivity(),item.topic_info.topic_id ,item.topic_info.topic_title);
+            return;
+        }
         if (item.user_info != null) {
             ProfileActivity.actionStart(getActivity(), item.user_info.uid);
         }

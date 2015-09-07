@@ -79,13 +79,10 @@ public class TopicDetailActivity extends BaseActivity implements TopicDetailView
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new TopicDetailAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
-
-        tvDescription.setOnClickListener(this);
-        btFocus.setOnClickListener(this);
     }
 
     @Override
-    protected List<Object> getModlues() {
+    protected List<Object> getModules() {
         return Arrays.<Object>asList(new TopicDetailModule(this));
     }
 
@@ -118,6 +115,9 @@ public class TopicDetailActivity extends BaseActivity implements TopicDetailView
             removeFocus();
         }
         btFocus.setVisibility(View.VISIBLE);
+
+        tvDescription.setOnClickListener(this);
+        btFocus.setOnClickListener(this);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class TopicDetailActivity extends BaseActivity implements TopicDetailView
     public void addFocus() {
         btFocus.setBackgroundResource(R.drawable.button_focused_background);
         btFocus.setText(getString(R.string.action_not_focus));
-        btFocus.setTextColor(getResources().getColor(R.color.color_accent));
+        btFocus.setTextColor(getResources().getColor(R.color.color_primary_dark));
     }
 
     @Override

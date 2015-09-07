@@ -19,9 +19,11 @@ public interface ExploreListView {
 
     void addListData(List<ExploreItem> items);
 
-    void startQuestionActivity(int position);
+    void startQuestionArticlActivity(int position);
 
     void startProfileActivity(int position);
+
+    void startAnswerActivity(int position);
 
     void showFooter();
 

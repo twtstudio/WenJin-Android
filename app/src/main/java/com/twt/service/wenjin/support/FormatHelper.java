@@ -41,14 +41,21 @@ public class FormatHelper {
             return hours + " " + ResourceHelper.getString(R.string.hours_ago);
         } else if (minutes > 0) {
             return minutes + " " + ResourceHelper.getString(R.string.minutes_ago);
-        } else {
+        } else if (seconds > 0){
             return seconds + " " + ResourceHelper.getString(R.string.seconds_ago);
+        } else {
+            return ResourceHelper.getString(R.string.just_now);
         }
     }
 
     public static String formatAddDate(long addtime) {
         Date date = new Date(addtime * 1000);
         return ResourceHelper.getString(R.string.add_in) + " " + new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date);
+    }
+
+    public static String formatAddDateWithoutAddinString(long addtime){
+        Date date = new Date(addtime * 1000);
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date);
     }
 
     public static String formatCommentReply(String username, String content) {
@@ -62,4 +69,9 @@ public class FormatHelper {
     public static String formatHomeHtmlStr(String html) {
         return html.replaceAll("<img src=.*?>", ResourceHelper.getString(R.string.pic));
     }
+
+    public static String formatQuestionLink(int questionId) {
+        return "http://wenjin.twtstudio.com/?/question/" + questionId;
+    }
+
 }

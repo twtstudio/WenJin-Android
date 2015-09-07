@@ -18,6 +18,7 @@ import com.twt.service.wenjin.bean.Answer;
 import com.twt.service.wenjin.bean.QuestionInfo;
 import com.twt.service.wenjin.bean.QuestionResponse;
 import com.twt.service.wenjin.bean.Topic;
+import com.twt.service.wenjin.support.FormatHelper;
 import com.twt.service.wenjin.support.ResourceHelper;
 import com.twt.service.wenjin.ui.common.OnItemClickListener;
 import com.twt.service.wenjin.ui.common.PicassoImageGetter;
@@ -122,12 +123,13 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                 null));
 
                 // tag group
-                question.tagGroup.setBrightColor(ResourceHelper.getColor(R.color.color_primary));
+                question.tagGroup.setBrightColor(ResourceHelper.getColor(R.color.color_accent));
                 ArrayList<String> tagStrings = new ArrayList<>();
                 for (Topic topic : mQuestionResponse.question_topics) {
                     tagStrings.add(topic.topic_title);
                 }
                 question.tagGroup.setTags(tagStrings);
+
 //                question.tagGroup.setOnClickListener(onClickListener);
 
                 // focus and comment number
@@ -155,7 +157,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     answerHolder.ivAvatar.setImageResource(R.drawable.ic_user_avatar);
                 }
                 answerHolder.tvUsername.setText(answer.nick_name);
-                answerHolder.tvContent.setText(Html.fromHtml(answer.answer_content, new PicassoImageGetter(mContext, answerHolder.tvContent), null));
+                answerHolder.tvContent.setText(Html.fromHtml(FormatHelper.formatHomeHtmlStr(answer.answer_content)));
 
                 answerHolder.ivAvatar.setOnClickListener(onClickListener);
                 answerHolder.tvUsername.setOnClickListener(onClickListener);

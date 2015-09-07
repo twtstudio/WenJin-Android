@@ -25,4 +25,10 @@ proguard/
 # Log Files
 *.log
 
-workspace.xml
+# Intelij project files
+.idea/
+
+# Mac cache files
+.DS_Store
+app/app.iml
+WenJin-Android.iml

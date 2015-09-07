@@ -13,8 +13,9 @@ public class TopicListPresenterImpl implements TopicListPresenter, OnGetTopicsCa
     private TopicListView mView;
     private TopicListInteractor mInteractor;
 
-    private int page = 0;
+    private int page = 1;
     private boolean isLoadMore = false;
+    private boolean isRefreshing = false;
 
     public TopicListPresenterImpl(TopicListView view, TopicListInteractor interactor) {
         this.mView = view;
@@ -24,6 +25,7 @@ public class TopicListPresenterImpl implements TopicListPresenter, OnGetTopicsCa
     @Override
     public void loadMoreTopics(int type) {
 //        mView.startRefresh();
+        if(isLoadMore){return;}
         page += 1;
         isLoadMore = true;
         switch (type) {
@@ -39,7 +41,7 @@ public class TopicListPresenterImpl implements TopicListPresenter, OnGetTopicsCa
     @Override
     public void refreshTopics(int type) {
         mView.startRefresh();
-        page = 0;
+        page = 1;
         switch (type) {
             case 0:
                 mInteractor.getTopics("hot", page, this);
@@ -65,11 +67,13 @@ public class TopicListPresenterImpl implements TopicListPresenter, OnGetTopicsCa
             mView.toastMessage(ResourceHelper.getString(R.string.no_more_information));
         }
         isLoadMore = false;
+        isRefreshing = false;
     }
 
     @Override
     public void onGetTopicsFailure(String errorMsg) {
         isLoadMore = false;
+        isRefreshing = false;
         mView.toastMessage(errorMsg);
     }
 }

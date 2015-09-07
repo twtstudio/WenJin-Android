@@ -72,9 +72,35 @@ public class InteractorsModule {
     @Provides @Singleton ProfileAskanswerInteractor provideProfileAskanswerInteractor(){
         return new ProfileAskanswerInteractorImpl();
     }
+    
     @Provides @Singleton
     public FeedbackInteractor provideFeedbackInteractor() {
         return new FeedbackInteractorImpl();
     }
 
+    @Provides @Singleton FollowsInteractor provideFollowsInteractor(){
+        return new FollowsInteracotrImpl();
+    }
+
+    @Provides
+    @Singleton
+    public ArticleInteractor provideArticleInteractor() {
+        return new ArticleInteractorImpl();
+    }
+
+
+    @Provides
+    @Singleton
+    public ArticleCommentInteractor provideArticleCommentInteractor() {
+        return new ArticleCommentInteractorImpl();
+    }
+
+    @Provides
+    @Singleton
+    public ProfileEditInteractor provideProfileEditInteractor(){
+        return new ProfileEditInteractorImpl();
+    }
+
+    @Provides @Singleton
+    public NotificationInteractor provideNotificationInteractor(){return new NotificationInteractorImpl();}
 }
